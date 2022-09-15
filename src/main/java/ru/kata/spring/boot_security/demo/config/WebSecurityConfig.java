@@ -15,12 +15,10 @@ import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    private final SuccessUserHandler successUserHandler;
     private final UserServiceImpl userService;
 
     @Autowired
-    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserServiceImpl userService) {
-        this.successUserHandler = successUserHandler;
+    public WebSecurityConfig(UserServiceImpl userService) {
         this.userService = userService;
     }
 
@@ -28,12 +26,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                    .antMatchers("/").permitAll()
-                    .antMatchers("/admin/**").hasRole("ADMIN")
-                    .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-                    .anyRequest().authenticated()
+                    .antMatchers("/main/**").authenticated()
                 .and()
-                    .formLogin().successHandler(successUserHandler)
+                    .formLogin().loginPage("/").loginProcessingUrl("/perform-login").successForwardUrl("/main")
                     .permitAll()
                 .and()
                     .logout()
@@ -41,9 +36,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    //@Lazy
+    @Lazy
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12); //The default value of the "strength" is 10.
+        return new BCryptPasswordEncoder(12);
     }
 
     @Bean

@@ -18,7 +18,10 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "Email_address")
     private String username;
+
+    private String firstName;
 
     private String lastName;
 
